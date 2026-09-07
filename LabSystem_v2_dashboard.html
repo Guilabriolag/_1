@@ -1,0 +1,2488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LabSystem">
+<meta name="theme-color" content="#0a0c10">
+<title>LabSystem ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --bg2: #111318;
+  --bg3: #181b22;
+  --border: #1e2330;
+  --accent: #00d4ff;
+  --accent2: #f5a623;
+  --accent3: #00ff88;
+  --danger: #ff4757;
+  --text: #e8eaf0;
+  --text2: #7a8098;
+  --text3: #4a5068;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font-mono: 'Space Mono', monospace;
+  --font: 'DM Sans', sans-serif;
+  --nav-h: 64px;
+  --header-h: 56px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+}
+
+/* ── TOP HEADER ── */
+#top-header {
+  height: var(--header-h);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.header-logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), #0066ff);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: #000;
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-family: var(--font-mono);
+  font-size: 13px; font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+
+.header-title span { color: var(--accent); }
+
+.header-store-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent3);
+  box-shadow: 0 0 6px var(--accent3);
+  animation: pulse-dot 2s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+.header-btn {
+  width: 36px; height: 36px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-btn:active { background: var(--border); transform: scale(.94); }
+
+.publish-btn {
+  background: linear-gradient(135deg, var(--accent), #0066ff);
+  border: none;
+  color: #000;
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: .3px;
+  transition: opacity .2s;
+}
+
+.publish-btn:active { opacity: .8; transform: scale(.96); }
+
+/* ── MAIN CONTENT AREA ── */
+#content-area {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── SCROLL PAGES ── */
+.page {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 16px calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  display: none;
+  animation: pageIn .25s ease;
+}
+
+.page.active { display: block; }
+
+@keyframes pageIn {
+  from { opacity:0; transform:translateY(8px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Custom scrollbar */
+.page::-webkit-scrollbar { width: 3px; }
+.page::-webkit-scrollbar-track { background: transparent; }
+.page::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── BOTTOM NAV ── */
+#bottom-nav {
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: var(--nav-h);
+  cursor: pointer;
+  transition: all .2s;
+  position: relative;
+  gap: 3px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-tab:active { transform: scale(.9); }
+
+.nav-tab .tab-icon {
+  font-size: 22px;
+  transition: transform .2s;
+}
+
+.nav-tab .tab-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  letter-spacing: .3px;
+  transition: color .2s;
+}
+
+.nav-tab.active .tab-label { color: var(--accent); }
+.nav-tab.active .tab-icon { transform: scale(1.15); }
+
+.nav-tab .tab-indicator {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 2px;
+  background: var(--accent);
+  border-radius: 0 0 4px 4px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.nav-tab.active .tab-indicator { opacity: 1; }
+
+.nav-badge {
+  position: absolute;
+  top: 6px; right: calc(50% - 18px);
+  background: var(--danger);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--bg2);
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title {
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.card-body { padding: 16px; }
+
+/* ── STAT CARDS ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .15s;
+}
+
+.stat-card:active { transform: scale(.97); }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.stat-card.c-cyan::before { background:linear-gradient(90deg,var(--accent),transparent); }
+.stat-card.c-green::before { background:linear-gradient(90deg,var(--accent3),transparent); }
+.stat-card.c-amber::before { background:linear-gradient(90deg,var(--accent2),transparent); }
+.stat-card.c-red::before { background:linear-gradient(90deg,var(--danger),transparent); }
+
+.stat-label {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-sub { font-size: 10px; color: var(--text3); margin-top: 4px; }
+.stat-icon { position:absolute; right:12px; top:12px; font-size:22px; opacity:.12; }
+
+/* ── SECTION HEADER ── */
+.section-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  margin-top: 4px;
+}
+
+.section-hdr h2 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font);
+  transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active { transform: scale(.95); opacity: .85; }
+.btn-primary { background: var(--accent); color: #000; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text2); }
+.btn-outline:active { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: rgba(255,71,87,.15); border: 1px solid rgba(255,71,87,.3); color: var(--danger); }
+.btn-success { background: rgba(0,255,136,.15); border: 1px solid rgba(0,255,136,.3); color: var(--accent3); }
+.btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+.btn-block { width: 100%; justify-content: center; padding: 14px; border-radius: 12px; }
+
+/* ── FAB ── */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  right: 20px;
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--accent), #0066ff);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,212,255,.4);
+  z-index: 50;
+  transition: all .2s;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab:active { transform: scale(.9); }
+
+/* ── LIST ITEMS (mobile-friendly) ── */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.list-item:last-child { border-bottom: none; }
+.list-item:active { background: var(--bg3); }
+
+.list-avatar {
+  width: 42px; height: 42px;
+  border-radius: 12px;
+  background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.list-body { flex: 1; min-width: 0; }
+.list-title { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+.list-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.list-price { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: var(--accent3); }
+.list-chevron { color: var(--text3); font-size: 16px; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 3px 8px; border-radius: 20px;
+  font-size: 10px; font-weight: 700;
+  font-family: var(--font-mono);
+}
+.badge-green { background:rgba(0,255,136,.12); color:var(--accent3); }
+.badge-blue  { background:rgba(0,212,255,.12); color:var(--accent); }
+.badge-amber { background:rgba(245,166,35,.12); color:var(--accent2); }
+.badge-red   { background:rgba(255,71,87,.12);  color:var(--danger); }
+.badge-gray  { background:rgba(120,128,152,.12);color:var(--text2); }
+
+/* ── PROGRESS BAR ── */
+.progress { background:var(--bg3); border-radius:4px; height:5px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--accent),#0066ff); transition:width .6s; }
+.progress-fill.g { background:linear-gradient(90deg,var(--accent3),#00aa55); }
+.progress-fill.a { background:linear-gradient(90deg,var(--accent2),#ff8800); }
+
+/* ── MINI CHART ── */
+.mini-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 60px;
+  padding: 0 4px;
+}
+.mini-bar {
+  flex: 1;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, var(--accent) 0%, rgba(0,212,255,.2) 100%);
+  transition: height .5s;
+  min-height: 4px;
+}
+.mini-bar.today { background: linear-gradient(180deg, var(--accent3) 0%, rgba(0,255,136,.2) 100%); }
+
+/* ── TOGGLE ── */
+.toggle { position:relative; width:48px; height:26px; cursor:pointer; }
+.toggle input { opacity:0; width:0; height:0; }
+.toggle-slider { position:absolute; inset:0; background:var(--bg3); border:1px solid var(--border); border-radius:26px; transition:.3s; }
+.toggle-slider::before { content:''; position:absolute; width:18px; height:18px; left:3px; top:3px; background:var(--text3); border-radius:50%; transition:.3s; }
+.toggle input:checked + .toggle-slider { background:rgba(0,212,255,.2); border-color:var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(22px); background:var(--accent); }
+
+/* ── SWITCH ROW ── */
+.switch-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.switch-row:last-child { border-bottom: none; }
+.switch-info { flex: 1; }
+.switch-label { font-size: 14px; font-weight: 500; color: var(--text); }
+.switch-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+/* ── FORM ── */
+.form-field { margin-bottom: 14px; }
+.form-field label {
+  display: block;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 6px;
+}
+
+input, select, textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 13px 14px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: var(--font);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border .2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  background: rgba(0,212,255,.04);
+}
+
+input[type="color"] { height: 46px; padding: 4px; cursor: pointer; }
+input[type="range"] { padding: 4px 0; background: transparent; }
+select option { background: var(--bg3); }
+textarea { resize: vertical; min-height: 80px; }
+
+/* ── GAME CARD ── */
+.game-card {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.game-card:last-child { border-bottom: none; }
+.game-icon-wrap {
+  width: 52px; height: 52px;
+  background: var(--bg3);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.game-info { flex: 1; min-width: 0; }
+.game-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.game-desc { font-size: 12px; color: var(--text3); margin-bottom: 10px; line-height: 1.4; }
+.game-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.game-tag { font-size: 10px; font-family: var(--font-mono); color: var(--text3); background: var(--bg); padding: 3px 8px; border-radius: 20px; border: 1px solid var(--border); }
+
+/* ── KEY CARD ── */
+.key-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.key-card:last-child { border-bottom: none; }
+.key-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), #0066ff);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #000;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.key-code {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  background: rgba(0,212,255,.08);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+/* ── PRODUCT CARD (mobile) ── */
+.product-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.product-row:last-child { border-bottom: none; }
+.product-row:active { background: var(--bg3); }
+.product-thumb {
+  width: 52px; height: 52px;
+  background: var(--bg3);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.product-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ── BOTTOM SHEET ── */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 100;
+  display: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.sheet-overlay.open { display: block; animation: fadeIn .2s; }
+
+.sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0; right: 0;
+  background: var(--bg2);
+  border-radius: 20px 20px 0 0;
+  z-index: 101;
+  padding-bottom: var(--safe-bottom);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+
+.sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sheet-title {
+  font-family: var(--font-mono);
+  font-size: 14px; font-weight: 700;
+  color: var(--text);
+}
+
+.sheet-close {
+  width: 30px; height: 30px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer;
+  color: var(--text2);
+}
+
+.sheet-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 20px;
+  flex: 1;
+}
+
+/* ── SIDE DRAWER (menu "Mais") ── */
+#drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 200; display: none;
+  backdrop-filter: blur(4px);
+}
+#drawer-overlay.open { display: block; animation: fadeIn .2s; }
+
+#drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: min(320px, 85vw);
+  background: var(--bg2);
+  z-index: 201;
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+#drawer.open { transform: translateX(0); }
+
+.drawer-top {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.drawer-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), #0066ff);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: #000;
+}
+.drawer-store { flex: 1; }
+.drawer-store-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.drawer-store-plan { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
+
+.drawer-menu { flex: 1; overflow-y: auto; padding: 8px 0; }
+.drawer-section { padding: 12px 20px 4px; font-size: 9px; font-family: var(--font-mono); color: var(--text3); letter-spacing: 2px; text-transform: uppercase; }
+.drawer-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 13px 20px;
+  cursor: pointer;
+  transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.drawer-item:active { background: var(--bg3); }
+.drawer-item.active { background: rgba(0,212,255,.08); }
+.drawer-item .d-icon { font-size: 20px; width: 24px; text-align: center; }
+.drawer-item .d-label { font-size: 14px; font-weight: 500; color: var(--text2); flex: 1; }
+.drawer-item.active .d-label { color: var(--accent); }
+.drawer-badge { background: var(--accent); color: #000; font-size: 9px; font-family: var(--font-mono); font-weight: 700; padding: 2px 6px; border-radius: 20px; }
+.drawer-badge.warn { background: var(--accent2); }
+.drawer-badge.new { background: var(--accent3); }
+
+/* ── COLOR SWATCHES ── */
+.color-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+.color-swatch {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all .2s;
+}
+.color-swatch.active { border-color: var(--text); transform: scale(1.1); }
+
+/* ── NOTIFICATIONS ── */
+#notify {
+  position: fixed;
+  top: calc(var(--safe-top) + var(--header-h) + 8px);
+  left: 12px; right: 12px;
+  z-index: 999;
+  display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+
+.notify-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text);
+  display: flex; align-items: center; gap: 10px;
+  animation: notifySlide .3s;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
+  pointer-events: all;
+}
+
+@keyframes notifySlide { from{transform:translateY(-20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+.notify-item.success { border-color: rgba(0,255,136,.3); }
+.notify-item.error { border-color: rgba(255,71,87,.3); }
+
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+/* ── ORDER CARD ── */
+.order-card {
+  background: var(--bg3);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.order-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.order-id { font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
+.order-cliente { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.order-info { font-size: 12px; color: var(--text3); }
+.order-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.order-total { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--accent3); }
+
+/* ── SEARCH BAR ── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 14px;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+.search-bar span { font-size: 16px; color: var(--text3); }
+.search-bar input { border: none; background: transparent; padding: 13px 0; font-size: 15px; }
+
+/* ── SOCIAL BUTTONS ── */
+.social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.social-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 12px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer;
+  font-size: 14px; font-weight: 500; color: var(--text2);
+  transition: all .15s;
+}
+.social-btn:active { border-color: var(--accent); color: var(--text); transform: scale(.97); }
+
+/* ── STAT STRIP (full width) ── */
+.stat-strip {
+  display: flex;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.stat-strip-item {
+  flex: 1;
+  padding: 14px 10px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+.stat-strip-item:last-child { border-right: none; }
+.strip-val { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--text); }
+.strip-lbl { font-size: 9px; font-family: var(--font-mono); color: var(--text3); text-transform: uppercase; letter-spacing: .8px; margin-top: 3px; }
+
+/* ── PERMISSIONS TABLE ── */
+.perm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.perm-table th { padding: 10px 8px; font-size: 10px; font-family: var(--font-mono); color: var(--text3); text-align: center; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.perm-table td { padding: 10px 8px; border-top: 1px solid var(--border); color: var(--text2); }
+.perm-table td:first-child { font-size: 12px; }
+.perm-table td:not(:first-child) { text-align: center; }
+
+/* ── QR-LAB ── */
+.qr-type-btn{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;font-size:1.1rem;line-height:1.3;transition:all .2s;}
+.qr-type-btn small{font-size:9px;font-family:var(--font-mono);color:var(--text3);display:block;margin-top:2px;}
+.qr-type-btn.active,.qr-type-btn:hover{border-color:var(--accent);background:rgba(0,212,255,.08);}
+.qr-type-btn.active small{color:var(--accent);}
+.badge-mini{display:inline-flex;align-items:center;}
+
+/* ── LABCHAIN ── */
+.chain-item{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--border);}
+.chain-item:last-child{border-bottom:none;}
+.chain-icon{width:32px;height:32px;border-radius:8px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.25);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.chain-info{flex:1;min-width:0;}
+.chain-doc-type{font-size:11px;font-weight:600;color:var(--text);}
+.chain-hash-preview{font-size:9px;font-family:var(--font-mono);color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chain-ts{font-size:9px;color:var(--text3);flex-shrink:0;text-align:right;}
+
+/* ── WAR ROOM ── */
+.heat-dot{padding:5px 10px;border-radius:20px;font-size:9px;font-family:var(--font-mono);cursor:pointer;transition:transform .2s;}
+.heat-dot:hover{transform:scale(1.1);}
+.wr-event{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg3);border-radius:6px;margin-bottom:4px;font-size:10px;animation:slidein .3s ease;}
+@keyframes slidein{from{opacity:0;transform:translateX(-10px);}to{opacity:1;transform:translateX(0);}}
+.wr-event-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.terr-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);transition:background .2s;}
+.terr-row:last-child{border-bottom:none;}
+.terr-row.active-terr{background:rgba(0,255,136,.04);border-left:3px solid var(--accent3);}
+.terr-name{font-size:12px;font-weight:600;color:var(--text);}
+.terr-year{font-size:9px;font-family:var(--font-mono);color:var(--text3);}
+.terr-status{text-align:right;}
+</style>
+</head>
+<body>
+
+<!-- TOP HEADER -->
+<div id="top-header">
+  <div class="header-logo">L</div>
+  <div class="header-title">LAB<span>SYSTEM</span></div>
+  <div class="header-store-dot"></div>
+  <div class="header-btn" onclick="publishData()" title="Publicar" style="font-size:14px;font-weight:700;font-family:var(--font-mono);width:auto;padding:0 12px;background:linear-gradient(135deg,var(--accent),#0066ff);border:none;color:#000;">⚡ PUB</div>
+  <div class="header-btn" onclick="openDrawer()">☰</div>
+</div>
+
+<!-- CONTENT AREA -->
+<div id="content-area">
+
+  <!-- ═══ DASHBOARD ═══ -->
+  <div class="page active" id="page-dashboard">
+
+    <div class="stats-row">
+      <div class="stat-card c-green">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Vendas Hoje</div>
+        <div class="stat-value" id="stat-vendas">R$ 0</div>
+        <div class="stat-sub">↑ +12%</div>
+      </div>
+      <div class="stat-card c-cyan">
+        <div class="stat-icon">🛒</div>
+        <div class="stat-label">Pedidos</div>
+        <div class="stat-value" id="stat-pedidos">0</div>
+        <div class="stat-sub">Hoje</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card c-amber">
+        <div class="stat-icon">🎮</div>
+        <div class="stat-label">Jogadas</div>
+        <div class="stat-value" id="stat-jogadas">0</div>
+        <div class="stat-sub" id="stat-brindes">0 brindes</div>
+      </div>
+      <div class="stat-card c-red">
+        <div class="stat-icon">📦</div>
+        <div class="stat-label">Estoque Baixo</div>
+        <div class="stat-value" id="stat-estoque">0</div>
+        <div class="stat-sub">Alertas</div>
+      </div>
+    </div>
+
+    <!-- Mini Chart -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📈 Vendas — 7 dias</div>
+        <span class="badge badge-green">Ao vivo</span>
+      </div>
+      <div class="card-body" style="padding-bottom:8px;">
+        <div class="mini-chart" id="mini-chart"></div>
+        <div style="display:flex;gap:4px;margin-top:6px;" id="mini-labels"></div>
+      </div>
+    </div>
+
+    <!-- Top produtos -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🔥 Mais Vendidos</div>
+      </div>
+      <div id="top-prods-mobile"></div>
+    </div>
+
+    <!-- Pedidos recentes -->
+    <div class="section-hdr">
+      <h2>Pedidos Recentes</h2>
+      <button class="btn btn-outline btn-sm" onclick="switchPage('pedidos',3)">Ver todos</button>
+    </div>
+
+    <div id="recent-orders-mobile"></div>
+
+  </div>
+
+  <!-- ═══ PRODUTOS ═══ -->
+  <div class="page" id="page-produtos">
+    <div class="search-bar">
+      <span>🔍</span>
+      <input type="text" placeholder="Buscar produto..." oninput="filterProductsMobile(this.value)">
+    </div>
+
+    <!-- Filtros categorias -->
+    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none;" id="cat-filter-mobile">
+      <button class="btn btn-primary btn-sm" style="white-space:nowrap;" onclick="filterCatMobile('all',this)">Todos</button>
+    </div>
+
+    <div class="card" style="margin-bottom:70px;">
+      <div id="product-list-mobile"></div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" onclick="openSheet('sheet-produto')">+</button>
+  </div>
+
+  <!-- ═══ PEDIDOS ═══ -->
+  <div class="page" id="page-pedidos">
+    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none;">
+      <button class="btn btn-primary btn-sm" style="white-space:nowrap;">Todos</button>
+      <button class="btn btn-outline btn-sm" style="white-space:nowrap;">Pendente</button>
+      <button class="btn btn-outline btn-sm" style="white-space:nowrap;">Preparando</button>
+      <button class="btn btn-outline btn-sm" style="white-space:nowrap;">Entregando</button>
+      <button class="btn btn-outline btn-sm" style="white-space:nowrap;">Concluído</button>
+    </div>
+    <div id="orders-mobile"></div>
+  </div>
+
+  <!-- ═══ LABGAME ═══ -->
+  <div class="page" id="page-labgame">
+
+    <div class="stat-strip">
+      <div class="stat-strip-item"><div class="strip-val" id="g-total">0</div><div class="strip-lbl">Jogadas</div></div>
+      <div class="stat-strip-item"><div class="strip-val" id="g-pendentes" style="color:var(--accent2);">0</div><div class="strip-lbl">Pendentes</div></div>
+      <div class="stat-strip-item"><div class="strip-val" id="g-resgatados" style="color:var(--accent3);">0</div><div class="strip-lbl">Resgatados</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎮 Jogos Disponíveis</div></div>
+
+      <!-- MimoGame -->
+      <div class="game-card">
+        <div class="game-icon-wrap">🧠</div>
+        <div class="game-info">
+          <div class="game-name">MimoGame</div>
+          <div class="game-desc">Jogo da memória com brindes configuráveis.</div>
+          <div class="game-tags">
+            <span class="game-tag" id="m-freq-tag">1/100 jogadas</span>
+            <span class="game-tag" id="m-brinde-tag">Brinde: —</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <label class="toggle"><input type="checkbox" id="mimo-ativo" onchange="saveGameConfig()"><span class="toggle-slider"></span></label>
+          <button class="btn btn-outline btn-sm" onclick="openSheet('sheet-mimogame')">⚙️</button>
+        </div>
+      </div>
+
+      <!-- Slots -->
+      <div class="game-card">
+        <div class="game-icon-wrap">🎰</div>
+        <div class="game-info">
+          <div class="game-name">LabGame Slots</div>
+          <div class="game-desc">Caça-níqueis digital com créditos.</div>
+          <div class="game-tags">
+            <span class="game-tag" id="s-cred-tag">10 créditos</span>
+            <span class="game-tag" id="s-razao-tag">10/R$1</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <label class="toggle"><input type="checkbox" id="slots-ativo" onchange="saveGameConfig()"><span class="toggle-slider"></span></label>
+          <button class="btn btn-outline btn-sm" onclick="openSheet('sheet-slots')">⚙️</button>
+        </div>
+      </div>
+
+      <!-- Em breve -->
+      <div class="game-card" style="opacity:.4;">
+        <div class="game-icon-wrap">🎲</div>
+        <div class="game-info">
+          <div class="game-name">Roleta Digital</div>
+          <div class="game-desc">Em breve — Fase 3</div>
+        </div>
+        <span class="badge badge-amber">Soon</span>
+      </div>
+
+      <div class="game-card" style="opacity:.4;">
+        <div class="game-icon-wrap">🎟️</div>
+        <div class="game-info">
+          <div class="game-name">Raspadinha</div>
+          <div class="game-desc">Em breve — Fase 3</div>
+        </div>
+        <span class="badge badge-amber">Soon</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ MAIS (via drawer) ══ já está no drawer ═══ -->
+
+  <!-- ═══ CUPONS (carregado via drawer) ═══ -->
+  <div class="page" id="page-cupons">
+    <div class="stat-strip">
+      <div class="stat-strip-item"><div class="strip-val">0</div><div class="strip-lbl">Total</div></div>
+      <div class="stat-strip-item"><div class="strip-val" style="color:var(--accent3);">0</div><div class="strip-lbl">Ativos</div></div>
+      <div class="stat-strip-item"><div class="strip-val" style="color:var(--accent2);">0</div><div class="strip-lbl">Usados</div></div>
+    </div>
+    <div class="card" style="margin-bottom:70px;">
+      <div id="cupons-list-mobile"></div>
+    </div>
+    <button class="fab" onclick="openSheet('sheet-cupom')">+</button>
+  </div>
+
+  <!-- ═══ PESSOAS ═══ -->
+  <div class="page" id="page-pessoas">
+    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none;">
+      <button class="btn btn-primary btn-sm" style="white-space:nowrap;">👤 Clientes</button>
+      <button class="btn btn-outline btn-sm" style="white-space:nowrap;">🧑‍💼 Funcionários</button>
+      <button class="btn btn-outline btn-sm" style="white-space:nowrap;">🏭 Fornecedores</button>
+      <button class="btn btn-outline btn-sm" style="white-space:nowrap;">🤝 Parceiros</button>
+    </div>
+    <div class="card"><div style="padding:40px;text-align:center;color:var(--text3);">Nenhum cadastro ainda.</div></div>
+    <button class="fab">+</button>
+  </div>
+
+  <!-- ═══ FINANCEIRO ═══ -->
+  <div class="page" id="page-financeiro">
+    <div class="stats-row">
+      <div class="stat-card c-green"><div class="stat-label">Receita</div><div class="stat-value" style="font-size:18px;">R$ 0</div><div class="stat-sub">Este mês</div></div>
+      <div class="stat-card c-red"><div class="stat-label">A Pagar</div><div class="stat-value" style="font-size:18px;">R$ 0</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">💳 Pagamentos</div></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">💵 Dinheiro</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">⚡ Pix</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">💳 Crédito</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">💳 Débito</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">📄 Boleto</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+    </div>
+  </div>
+
+  <!-- ═══ KEYS ═══ -->
+  <div class="page" id="page-keys">
+    <div class="card" style="margin-bottom:70px;">
+      <div class="card-header">
+        <div class="card-title">🔑 Acessos</div>
+      </div>
+      <div id="keys-list-mobile">
+        <div style="padding:40px;text-align:center;color:var(--text3);">Nenhuma key criada.</div>
+      </div>
+    </div>
+    <button class="fab" onclick="openSheet('sheet-key')">+</button>
+  </div>
+
+  <!-- ═══ CUSTOMIZAR ═══ -->
+  <div class="page" id="page-customizar">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🏪 Identidade</div></div>
+      <div class="card-body">
+        <div class="form-field"><label>Nome da Loja</label><input type="text" id="c-nome" placeholder="Ex: McClone"></div>
+        <div class="form-field"><label>Slogan</label><input type="text" id="c-slogan" placeholder="Ex: Sabor rápido!"></div>
+        <div class="form-field"><label>URL do Logo</label><input type="url" id="c-logo" placeholder="https://..."></div>
+        <div class="form-field"><label>Imagem de Fundo</label><input type="url" id="c-fundo" placeholder="https://..."></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎨 Cores</div></div>
+      <div class="card-body">
+        <div class="form-field">
+          <label>Cor Primária</label>
+          <div style="display:flex;gap:10px;">
+            <input type="color" id="c-cor1" value="#00d4ff" style="width:60px;">
+            <input type="text" id="c-cor1-hex" value="#00d4ff" style="flex:1;">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Cor Secundária</label>
+          <div style="display:flex;gap:10px;">
+            <input type="color" id="c-cor2" value="#f5a623" style="width:60px;">
+            <input type="text" id="c-cor2-hex" value="#f5a623" style="flex:1;">
+          </div>
+        </div>
+        <label style="font-size:11px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block;">Presets</label>
+        <div class="color-row">
+          <div class="color-swatch" style="background:#DA291C;" onclick="applyPreset('#DA291C','#FFCC00')"></div>
+          <div class="color-swatch" style="background:#10B981;" onclick="applyPreset('#10B981','#059669')"></div>
+          <div class="color-swatch" style="background:#6366f1;" onclick="applyPreset('#6366f1','#8b5cf6')"></div>
+          <div class="color-swatch" style="background:#f59e0b;" onclick="applyPreset('#f59e0b','#ef4444')"></div>
+          <div class="color-swatch" style="background:#0ea5e9;" onclick="applyPreset('#0ea5e9','#06b6d4')"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🎵 Música</div></div>
+      <div class="card-body">
+        <div class="form-field"><label>YouTube URL</label><input type="url" id="c-musica" placeholder="https://youtube.com/..."></div>
+        <div class="form-field"><label>Volume</label><input type="range" id="c-volume" min="0" max="100" value="30" style="padding:4px 0;"></div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-bottom:80px;" onclick="saveCustomization()">💾 Salvar Visual</button>
+  </div>
+
+  <!-- ═══ CONFIG ═══ -->
+  <div class="page" id="page-config">
+    <div class="card">
+      <div class="card-header"><div class="card-title">🏪 Operacional</div></div>
+      <div class="card-body">
+        <div class="form-field"><label>WhatsApp</label><input type="tel" id="cfg-whatsapp" placeholder="5511999999999"></div>
+        <div class="form-field"><label>Status</label>
+          <select id="cfg-status">
+            <option value="aberta">✅ Aberta</option>
+            <option value="fechada">❌ Fechada</option>
+            <option value="pausada">⏸ Pausada</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Segmento</label>
+          <select id="cfg-segmento">
+            <option>🍔 Hamburgueria</option><option>🍕 Pizzaria</option><option>🥤 Lanchonete</option>
+            <option>🍽️ Restaurante</option><option>☕ Cafeteria</option><option>🦷 Clínica</option>
+            <option>🐾 Pet Shop</option><option>💅 Salão</option><option>🏋️ Academia</option>
+            <option>⚖️ Advocacia</option><option>🛒 Varejo</option><option>⚙️ Outro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🌐 API</div></div>
+      <div class="card-body">
+        <div class="form-field"><label>API URL</label><input type="text" id="cfg-api" value="https://labsystem-api.lab-wokerlabcore.workers.dev"></div>
+        <div class="form-field"><label>Store ID</label><input type="text" id="cfg-store-id" placeholder="ex: mcclone-001"></div>
+        <div class="form-field"><label>Master Key</label><input type="password" id="cfg-master-key" placeholder="••••••••"></div>
+        <button class="btn btn-success btn-block" onclick="testConnection()">🔌 Testar Conexão</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🔔 Notificações</div></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">WhatsApp por pedido</div><div class="switch-desc">Alerta a cada novo pedido</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">Alerta de estoque</div><div class="switch-desc">Avisa quando produto acabar</div></div><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+      <div class="switch-row"><div class="switch-info"><div class="switch-label">Relatório diário</div><div class="switch-desc">Resumo às 23h</div></div><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-bottom:80px;" onclick="saveConfig()">💾 Salvar Config</button>
+  </div>
+
+  <!-- ═══ LABADS ═══ -->
+  <div class="page" id="page-ads">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📱 Redes Sociais</div></div>
+      <div class="card-body">
+        <div class="social-grid">
+          <div class="social-btn">📸 Instagram</div>
+          <div class="social-btn">👍 Facebook</div>
+          <div class="social-btn">🎵 TikTok</div>
+          <div class="social-btn">💬 WhatsApp</div>
+          <div class="social-btn">▶️ YouTube</div>
+          <div class="social-btn" style="opacity:.4;">🔍 Google Ads</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">🖼️ Banner no Totem</div></div>
+      <div class="card-body">
+        <div class="form-field"><label>URL da Imagem</label><input type="url" placeholder="https://..."></div>
+        <div class="form-field"><label>Link de Destino</label><input type="url" placeholder="https://..."></div>
+        <div class="form-field"><label>Validade</label><input type="date"></div>
+        <button class="btn btn-primary btn-block">Salvar Banner</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ QRLAB ═══ -->
+  <div class="page" id="page-qrlab">
+    <div class="section-hdr">
+      <h2>QR-Lab <span style="color:var(--accent3);font-size:10px;margin-left:4px;">ATIVO</span></h2>
+    </div>
+
+    <!-- Tipo de QR -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header"><div class="card-title">⚡ Tipo de QR Code</div></div>
+      <div class="card-body" style="padding-top:8px;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+          <div class="qr-type-btn active" onclick="selectQRType(this,'site')">🌐<br><small>Site</small></div>
+          <div class="qr-type-btn" onclick="selectQRType(this,'labmenu')">🍔<br><small>LabMenu</small></div>
+          <div class="qr-type-btn" onclick="selectQRType(this,'labpay')">⚡<br><small>LabPay</small></div>
+          <div class="qr-type-btn" onclick="selectQRType(this,'lablink')">🔗<br><small>LabLink</small></div>
+          <div class="qr-type-btn" onclick="selectQRType(this,'labchain')">🔐<br><small>LabChain</small></div>
+          <div class="qr-type-btn" onclick="selectQRType(this,'labgame')">🎮<br><small>LabGame</small></div>
+        </div>
+
+        <div class="form-field">
+          <label>URL / Conteúdo</label>
+          <input type="text" id="qr-url" placeholder="https://labriolag.shop/?src=">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div class="form-field" style="margin-bottom:0;">
+            <label>Modo</label>
+            <select id="qr-mode">
+              <option value="manual">Manual</option>
+              <option value="numerado">Numerado (01,02...)</option>
+              <option value="letras">Por Letras (A,B...)</option>
+              <option value="aleatorio">Aleatório</option>
+            </select>
+          </div>
+          <div class="form-field" style="margin-bottom:0;">
+            <label>Quantidade</label>
+            <input type="number" id="qr-qty" value="1" min="1" max="50">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div class="form-field" style="margin-bottom:0;">
+            <label>Cor Primária</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="color" id="qr-color" value="#00d4ff" style="width:36px;height:32px;border-radius:6px;border:1px solid var(--border);background:none;">
+              <input type="text" id="qr-color-hex" value="#00d4ff" style="flex:1;font-size:11px;">
+            </div>
+          </div>
+          <div class="form-field" style="margin-bottom:0;">
+            <label>Cor de Fundo</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="color" id="qr-bg" value="#0a0c10" style="width:36px;height:32px;border-radius:6px;border:1px solid var(--border);background:none;">
+              <input type="text" id="qr-bg-hex" value="#0a0c10" style="flex:1;font-size:11px;">
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="gerarQR()">⚡ Gerar QR Code</button>
+      </div>
+    </div>
+
+    <!-- Preview + Download -->
+    <div class="card" id="qr-preview-card" style="display:none;margin-bottom:12px;">
+      <div class="card-header"><div class="card-title">👁 Preview</div></div>
+      <div class="card-body" style="text-align:center;">
+        <div id="qr-canvas-wrap" style="background:#fff;border-radius:12px;padding:16px;display:inline-block;margin-bottom:12px;"></div>
+        <div id="qr-url-display" style="font-size:10px;color:var(--text3);margin-bottom:12px;word-break:break-all;"></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-block" onclick="downloadQR()">⬇ PNG</button>
+          <button class="btn btn-primary btn-block" onclick="compartilharQR()">📤 Compartilhar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QR Signature (Anti-fraude) -->
+    <div class="card" style="margin-bottom:70px;">
+      <div class="card-header">
+        <div class="card-title">🔐 Assinatura HMAC</div>
+        <div class="badge-mini" style="background:rgba(0,212,255,.15);color:var(--accent);border:1px solid rgba(0,212,255,.3);padding:3px 8px;border-radius:20px;font-size:9px;font-family:var(--font-mono);">ANTI-FRAUDE</div>
+      </div>
+      <div class="card-body">
+        <div class="form-field">
+          <label>Chave Secreta HMAC</label>
+          <input type="password" id="qr-hmac-key" placeholder="Sua chave privada">
+        </div>
+        <div class="form-field">
+          <label>Expiração do Link</label>
+          <select id="qr-expire">
+            <option value="0">Sem expiração</option>
+            <option value="24">24 horas</option>
+            <option value="72">72 horas</option>
+            <option value="168">7 dias</option>
+          </select>
+        </div>
+        <div id="qr-signature-result" style="display:none;background:var(--bg3);border-radius:8px;padding:10px;margin-top:8px;">
+          <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:4px;">HMAC-SHA256</div>
+          <div id="qr-sig-value" style="font-size:10px;font-family:var(--font-mono);color:var(--accent3);word-break:break-all;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LABCHAIN ═══ -->
+  <div class="page" id="page-labchain">
+    <div class="section-hdr">
+      <h2>LabChain <span style="color:var(--accent2);font-size:10px;margin-left:4px;">CARTÓRIO DIGITAL</span></h2>
+    </div>
+
+    <!-- Status da rede -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+      <div class="stat-card" style="padding:12px;text-align:center;">
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:4px;">DOCS REGISTRADOS</div>
+        <div style="font-family:var(--font-mono);font-size:1.3rem;font-weight:700;color:var(--accent2);" id="chain-total-docs">0</div>
+      </div>
+      <div class="stat-card" style="padding:12px;text-align:center;">
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:4px;">SATS DOADOS</div>
+        <div style="font-family:var(--font-mono);font-size:1.3rem;font-weight:700;color:var(--accent3);" id="chain-total-sats">0</div>
+      </div>
+      <div class="stat-card" style="padding:12px;text-align:center;">
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:4px;">REDE</div>
+        <div style="font-family:var(--font-mono);font-size:.75rem;font-weight:700;color:var(--accent);display:flex;align-items:center;justify-content:center;gap:4px;margin-top:4px;">
+          <span style="width:6px;height:6px;background:var(--accent3);border-radius:50%;display:inline-block;animation:pulse-dot 2s infinite;"></span>
+          Bitcoin
+        </div>
+      </div>
+    </div>
+
+    <!-- Registrar documento -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header">
+        <div class="card-title">📜 Registrar Documento</div>
+      </div>
+      <div class="card-body">
+        <div class="form-field">
+          <label>Tipo de Documento</label>
+          <select id="chain-doc-type">
+            <option value="contrato">📋 Contrato de Adesão (Cota Fundador)</option>
+            <option value="nota">🧾 Nota Fiscal / Recibo</option>
+            <option value="certificado">🏆 Certificado de Pioneiro</option>
+            <option value="termo">📄 Termo de Serviço</option>
+            <option value="acordo">🤝 Acordo Comercial</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Partes Envolvidas</label>
+          <input type="text" id="chain-partes" placeholder="Ex: Labriolag Holding + Pizzaria do João">
+        </div>
+        <div class="form-field">
+          <label>Cidade / Território</label>
+          <select id="chain-cidade">
+            <option value="pirapora">🏙️ Pirapora do Bom Jesus — SP (Piloto)</option>
+            <option value="aracariguama">🏙️ Araçariguama — SP</option>
+            <option value="cajamar">🏙️ Cajamar — SP</option>
+            <option value="santana">🏙️ Santana de Parnaíba — SP</option>
+            <option value="barueri">🏙️ Barueri — SP</option>
+            <option value="alphaville">🏙️ Alphaville — SP</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Conteúdo / Resumo do Documento</label>
+          <textarea id="chain-content" rows="3" style="resize:none;padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font);font-size:13px;width:100%;outline:none;" placeholder="Descreva os termos principais..."></textarea>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="registrarLabChain()" style="background:linear-gradient(135deg,#f5a623,#d4870e);color:#000;font-weight:700;">
+          🔐 Gerar Hash + Registrar (1 Sat)
+        </button>
+
+        <!-- Alerta LabSocial -->
+        <div style="margin-top:10px;padding:10px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:8px;font-size:10px;color:var(--accent3);">
+          ⚡ 1 Sat será enviado automaticamente para o <strong>LabSocial · Fundo Pirapora</strong> como prova de registro na blockchain Bitcoin.
+        </div>
+      </div>
+    </div>
+
+    <!-- Hash resultado -->
+    <div class="card" id="chain-result-card" style="display:none;margin-bottom:12px;border-color:rgba(245,166,35,.4);">
+      <div class="card-header">
+        <div class="card-title" style="color:var(--accent2);">✅ Registro Gerado</div>
+        <div class="badge-mini" style="background:rgba(0,255,136,.1);color:var(--accent3);border:1px solid rgba(0,255,136,.3);padding:3px 8px;border-radius:20px;font-size:9px;">IMUTÁVEL</div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:4px;letter-spacing:1px;">SHA-256 DOCUMENT HASH</div>
+        <div id="chain-doc-hash" style="font-family:var(--font-mono);font-size:9px;color:var(--accent);word-break:break-all;background:var(--bg3);padding:8px;border-radius:6px;margin-bottom:8px;"></div>
+
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:4px;letter-spacing:1px;">TIMESTAMP</div>
+        <div id="chain-timestamp" style="font-size:10px;color:var(--text2);margin-bottom:8px;"></div>
+
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:4px;letter-spacing:1px;">BITCOIN TX (SIMULADO)</div>
+        <div id="chain-btc-tx" style="font-family:var(--font-mono);font-size:9px;color:var(--accent3);word-break:break-all;background:var(--bg3);padding:8px;border-radius:6px;margin-bottom:12px;"></div>
+
+        <!-- QR do certificado -->
+        <div style="text-align:center;margin-bottom:12px;">
+          <div id="chain-qr-wrap" style="background:#fff;border-radius:10px;padding:12px;display:inline-block;"></div>
+          <div style="font-size:9px;color:var(--text3);margin-top:6px;">QR Code do Certificado de Autenticidade</div>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-outline btn-block" onclick="copiarHash()">📋 Copiar Hash</button>
+          <button class="btn btn-primary btn-block" onclick="gerarCertificadoPDF()" style="background:linear-gradient(135deg,#f5a623,#d4870e);color:#000;">📜 Gerar Cert.</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Histórico de registros -->
+    <div class="card" style="margin-bottom:70px;">
+      <div class="card-header">
+        <div class="card-title">📋 Histórico</div>
+        <div style="font-size:10px;color:var(--text3);" id="chain-count">0 registros</div>
+      </div>
+      <div id="chain-history-list">
+        <div style="padding:30px;text-align:center;color:var(--text3);font-size:11px;">Nenhum registro ainda.<br>Registre seu primeiro contrato acima.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ WAR ROOM ═══ -->
+  <div class="page" id="page-warroom">
+    <div class="section-hdr">
+      <h2>War Room <span style="color:var(--danger);font-size:10px;margin-left:4px;">🎯 SNIPER</span></h2>
+    </div>
+
+    <!-- Live Telemetria -->
+    <div class="card" style="margin-bottom:12px;border-color:rgba(0,212,255,.2);">
+      <div class="card-header">
+        <div class="card-title">📡 Telemetria Live</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:9px;color:var(--accent3);">
+          <span style="width:6px;height:6px;background:var(--accent3);border-radius:50%;animation:pulse-dot 1s infinite;"></span>
+          AO VIVO
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:4px;">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;">
+          <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;font-weight:700;font-family:var(--font-mono);color:var(--accent);" id="wr-scans">0</div>
+            <div style="font-size:9px;color:var(--text3);">Scans Hoje</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;font-weight:700;font-family:var(--font-mono);color:var(--accent2);" id="wr-leads">0</div>
+            <div style="font-size:9px;color:var(--text3);">Leads</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;font-weight:700;font-family:var(--font-mono);color:var(--accent3);" id="wr-conv">0%</div>
+            <div style="font-size:9px;color:var(--text3);">Conversão</div>
+          </div>
+          <div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:1.6rem;font-weight:700;font-family:var(--font-mono);color:var(--danger);" id="wr-bounce">0%</div>
+            <div style="font-size:9px;color:var(--text3);">Bounce</div>
+          </div>
+        </div>
+
+        <!-- Feed de eventos ao vivo -->
+        <div style="font-size:9px;font-family:var(--font-mono);color:var(--text3);margin-bottom:6px;letter-spacing:1px;">FEED DE EVENTOS</div>
+        <div id="wr-feed" style="max-height:130px;overflow-y:auto;scrollbar-width:none;">
+          <div style="padding:8px;background:var(--bg3);border-radius:6px;font-size:10px;color:var(--text2);">Aguardando eventos...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapa de Calor -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header"><div class="card-title">🗺️ Mapa de Calor</div></div>
+      <div class="card-body" style="padding:0;">
+        <div id="wr-heatmap" style="height:160px;background:linear-gradient(135deg,var(--bg3) 0%,var(--bg2) 100%);border-radius:0 0 var(--radius-sm) var(--radius-sm);position:relative;overflow:hidden;">
+          <!-- Mapa simulado de Pirapora -->
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;">
+            <div style="font-size:11px;color:var(--text3);">📍 Pirapora do Bom Jesus</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding:8px;">
+              <div class="heat-dot" style="--h:0.9;--c:255,71,87;">Centro</div>
+              <div class="heat-dot" style="--h:0.7;--c:245,166,35;">Av. Principal</div>
+              <div class="heat-dot" style="--h:0.5;--c:0,212,255;">Mercado Mun.</div>
+              <div class="heat-dot" style="--h:0.3;--c:0,255,136;">Bairro Norte</div>
+              <div class="heat-dot" style="--h:0.4;--c:245,166,35;">Praça Central</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sniper — Remarketing -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-header">
+        <div class="card-title">🎯 Controle Sniper</div>
+        <div style="font-size:9px;color:var(--text3);">Remarketing</div>
+      </div>
+      <div class="card-body">
+        <div class="switch-row">
+          <div class="switch-info">
+            <div class="switch-label">Push: Carrinho abandonado</div>
+            <div class="switch-desc">Disparo automático após 2h</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="sniper-cart"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-info">
+            <div class="switch-label">WhatsApp: Promoção Geofence</div>
+            <div class="switch-desc">Ao entrar no raio de 500m</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="sniper-geo"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-info">
+            <div class="switch-label">LabAds: Escassez dinâmica</div>
+            <div class="switch-desc">Contador regressivo no banner</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="sniper-scarcity" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-info">
+            <div class="switch-label">Prova Social ao vivo</div>
+            <div class="switch-desc">"3 pessoas viram isso agora"</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="sniper-social" checked><span class="toggle-slider"></span></label>
+        </div>
+        <button class="btn btn-primary btn-block" style="margin-top:8px;background:linear-gradient(135deg,var(--danger),#c0392b);border:none;" onclick="dispararSniper()">🚀 Disparar Campanha Agora</button>
+      </div>
+    </div>
+
+    <!-- Expansão Territorial -->
+    <div class="card" style="margin-bottom:70px;">
+      <div class="card-header"><div class="card-title">🏙️ Expansão Territorial</div></div>
+      <div class="card-body" style="padding:0;">
+        <div class="terr-row active-terr">
+          <div class="terr-info">
+            <div class="terr-name">Pirapora do BJ</div>
+            <div class="terr-year">2025 · ISTD 4.9 · Piloto</div>
+          </div>
+          <div class="terr-status">
+            <div style="font-size:9px;color:var(--accent3);font-family:var(--font-mono);">ATIVO</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--accent2);">15/15</div>
+            <div style="font-size:8px;color:var(--text3);">cotas</div>
+          </div>
+        </div>
+        <div class="terr-row">
+          <div class="terr-info">
+            <div class="terr-name">Araçariguama</div>
+            <div class="terr-year">2026 · ISTD 5.6</div>
+          </div>
+          <div class="terr-status">
+            <div style="font-size:9px;color:var(--accent2);font-family:var(--font-mono);">PRÓXIMO</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--text2);">0/15</div>
+            <div style="font-size:8px;color:var(--text3);">cotas</div>
+          </div>
+        </div>
+        <div class="terr-row">
+          <div class="terr-info">
+            <div class="terr-name">Cajamar</div>
+            <div class="terr-year">2026 · ISTD 7.9</div>
+          </div>
+          <div class="terr-status">
+            <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">2026</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--text3);">—</div>
+          </div>
+        </div>
+        <div class="terr-row">
+          <div class="terr-info">
+            <div class="terr-name">Santana de Parnaíba</div>
+            <div class="terr-year">2027 · ISTD 9.1</div>
+          </div>
+          <div class="terr-status">
+            <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);">2027</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--text3);">—</div>
+          </div>
+        </div>
+        <div class="terr-row">
+          <div class="terr-info">
+            <div class="terr-name">Barueri · Alphaville</div>
+            <div class="terr-year">2028 · O Império</div>
+          </div>
+          <div class="terr-status">
+            <div style="font-size:9px;color:var(--accent2);font-family:var(--font-mono);opacity:.5;">2028</div>
+            <div style="font-size:.9rem;font-weight:700;color:var(--accent2);opacity:.5;">👑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ESTOQUE ═══ -->
+  <div class="page" id="page-estoque">
+    <div class="card">
+      <div class="card-header"><div class="card-title">📦 Estoque</div><button class="btn btn-primary btn-sm">+ Entrada</button></div>
+      <div style="padding:40px;text-align:center;color:var(--text3);">Nenhum item cadastrado.</div>
+    </div>
+  </div>
+
+</div><!-- /content-area -->
+
+<!-- BOTTOM NAV -->
+<nav id="bottom-nav">
+  <div class="nav-tab active" id="nav-0" onclick="switchPage('dashboard',0)">
+    <div class="tab-indicator"></div>
+    <div class="tab-icon">📊</div>
+    <div class="tab-label">Início</div>
+  </div>
+  <div class="nav-tab" id="nav-1" onclick="switchPage('produtos',1)">
+    <div class="tab-indicator"></div>
+    <div class="tab-icon">🍔</div>
+    <div class="tab-label">Produtos</div>
+  </div>
+  <div class="nav-tab" id="nav-2" onclick="switchPage('pedidos',2)">
+    <div class="tab-indicator"></div>
+    <div class="tab-icon">🛒</div>
+    <div class="tab-label">Pedidos</div>
+    <div class="nav-badge" id="orders-badge" style="display:none;">0</div>
+  </div>
+  <div class="nav-tab" id="nav-3" onclick="switchPage('labgame',3)">
+    <div class="tab-indicator"></div>
+    <div class="tab-icon">🎮</div>
+    <div class="tab-label">LabGame</div>
+  </div>
+  <div class="nav-tab" id="nav-4" onclick="openDrawer()">
+    <div class="tab-indicator"></div>
+    <div class="tab-icon">⋯</div>
+    <div class="tab-label">Mais</div>
+  </div>
+</nav>
+
+<!-- SIDE DRAWER -->
+<div id="drawer-overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drawer-top">
+    <div class="drawer-logo">L</div>
+    <div class="drawer-store">
+      <div class="drawer-store-name" id="drawer-store-name">Minha Loja</div>
+      <div class="drawer-store-plan">LabSystem Pro · v2.0</div>
+    </div>
+    <div class="header-btn" onclick="closeDrawer()">✕</div>
+  </div>
+  <div class="drawer-menu">
+    <div class="drawer-section">Catálogo</div>
+    <div class="drawer-item" onclick="goPage('pessoas')"><span class="d-icon">👤</span><span class="d-label">Pessoas</span></div>
+    <div class="drawer-item" onclick="goPage('cupons')"><span class="d-icon">🏷️</span><span class="d-label">Cupons</span><span class="drawer-badge new">NEW</span></div>
+
+    <div class="drawer-section">Marketing</div>
+    <div class="drawer-item" onclick="goPage('ads')"><span class="d-icon">📢</span><span class="d-label">LabAds</span></div>
+    <div class="drawer-item" onclick="goPage('qrlab')"><span class="d-icon">⚡</span><span class="d-label">QR-Lab</span><span class="drawer-badge new">NEW</span></div>
+    <div class="drawer-item" onclick="goPage('warroom')"><span class="d-icon">🎯</span><span class="d-label">War Room</span></div>
+
+    <div class="drawer-section">Gestão</div>
+    <div class="drawer-item" onclick="goPage('financeiro')"><span class="d-icon">💰</span><span class="d-label">Financeiro</span></div>
+    <div class="drawer-item" onclick="goPage('estoque')"><span class="d-icon">📦</span><span class="d-label">Estoque</span></div>
+    <div class="drawer-item" onclick="goPage('keys')"><span class="d-icon">🔑</span><span class="d-label">Keys / Acessos</span></div>
+    <div class="drawer-item" onclick="goPage('labchain')"><span class="d-icon">🔐</span><span class="d-label">LabChain</span><span class="drawer-badge" style="background:rgba(245,166,35,.2);color:#f5a623;border:1px solid rgba(245,166,35,.3);">NOVO</span></div>
+
+    <div class="drawer-section">Sistema</div>
+    <div class="drawer-item" onclick="goPage('customizar')"><span class="d-icon">🎨</span><span class="d-label">Customizar</span></div>
+    <div class="drawer-item" onclick="goPage('config')"><span class="d-icon">⚙️</span><span class="d-label">Configurações</span></div>
+
+    <div style="padding:16px 20px;margin-top:8px;">
+      <button class="btn btn-primary btn-block" onclick="publishData();closeDrawer();">⚡ Publicar Agora</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BOTTOM SHEETS ═══ -->
+
+<!-- Sheet: Produto -->
+<div class="sheet-overlay" id="overlay-sheet-produto" onclick="closeSheet('sheet-produto')"></div>
+<div class="sheet" id="sheet-produto">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">+ Novo Produto</div>
+    <div class="sheet-close" onclick="closeSheet('sheet-produto')">✕</div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-field"><label>Nome</label><input type="text" id="p-nome" placeholder="Ex: McClone Classic"></div>
+    <div class="form-field"><label>Categoria</label>
+      <select id="p-cat"><option>🍔 Hambúrgueres</option><option>🍟 Porções</option><option>🥤 Bebidas</option></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-field"><label>Preço (R$)</label><input type="number" id="p-preco" step="0.01" placeholder="0,00" inputmode="decimal"></div>
+      <div class="form-field"><label>Estoque</label><input type="number" id="p-estoque" placeholder="0" inputmode="numeric"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-field"><label>Alerta Mínimo</label><input type="number" id="p-alerta" placeholder="10" inputmode="numeric"></div>
+      <div class="form-field"><label>SKU</label><input type="text" id="p-sku" placeholder="BRG-001"></div>
+    </div>
+    <div class="form-field"><label>Descrição</label><textarea id="p-desc" placeholder="Descreva o produto..." rows="3"></textarea></div>
+    <div class="form-field"><label>URL da Imagem</label><input type="url" id="p-img" placeholder="https://..."></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--border);margin-top:4px;">
+      <div><div style="font-size:14px;font-weight:500;color:var(--text);">⭐ Destaque</div></div>
+      <label class="toggle"><input type="checkbox" id="p-destaque"><span class="toggle-slider"></span></label>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--border);">
+      <div><div style="font-size:14px;font-weight:500;color:var(--text);">✅ Ativo no Cardápio</div></div>
+      <label class="toggle"><input type="checkbox" id="p-ativo" checked><span class="toggle-slider"></span></label>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="addProduct()">Salvar Produto</button>
+    <button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="closeSheet('sheet-produto')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Sheet: MimoGame Config -->
+<div class="sheet-overlay" id="overlay-sheet-mimogame" onclick="closeSheet('sheet-mimogame')"></div>
+<div class="sheet" id="sheet-mimogame">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">⚙️ MimoGame</div>
+    <div class="sheet-close" onclick="closeSheet('sheet-mimogame')">✕</div>
+  </div>
+  <div class="sheet-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-field"><label>Frequência</label><input type="number" id="m-freq" value="100" inputmode="numeric"><div style="font-size:10px;color:var(--text3);margin-top:4px;">1 a cada X jogadas</div></div>
+      <div class="form-field"><label>Tempo (seg)</label><input type="number" id="m-tempo" value="60" inputmode="numeric"></div>
+    </div>
+    <div class="form-field"><label>Texto do Brinde</label><input type="text" id="m-brinde" placeholder="Ex: Refrigerante grátis!"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-field"><label>Valor (R$)</label><input type="number" id="m-valor" step="0.01" inputmode="decimal"></div>
+      <div class="form-field"><label>Quantidade</label><input type="number" id="m-qtd" inputmode="numeric"></div>
+    </div>
+    <div class="form-field"><label>Validade</label><input type="date" id="m-validade"></div>
+    <div class="form-field"><label>Exibição no Totem</label>
+      <select id="m-exibicao">
+        <option value="banner">Banner no topo</option>
+        <option value="botao">Botão fixo</option>
+        <option value="pos-pedido">Após finalizar pedido</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="saveMimoConfig()">Salvar</button>
+  </div>
+</div>
+
+<!-- Sheet: Slots Config -->
+<div class="sheet-overlay" id="overlay-sheet-slots" onclick="closeSheet('sheet-slots')"></div>
+<div class="sheet" id="sheet-slots">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">⚙️ LabGame Slots</div>
+    <div class="sheet-close" onclick="closeSheet('sheet-slots')">✕</div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-field"><label>Créditos Iniciais</label><input type="number" id="s-creditos" value="10" inputmode="numeric"></div>
+    <div class="form-field"><label>Créditos por R$1</label><input type="number" id="s-razao" value="10" inputmode="numeric"></div>
+    <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="saveSlotsConfig()">Salvar</button>
+  </div>
+</div>
+
+<!-- Sheet: Key -->
+<div class="sheet-overlay" id="overlay-sheet-key" onclick="closeSheet('sheet-key')"></div>
+<div class="sheet" id="sheet-key">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">🔑 Nova Key</div>
+    <div class="sheet-close" onclick="closeSheet('sheet-key')">✕</div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-field"><label>Nome do Funcionário</label><input type="text" id="k-nome" placeholder="Ex: João Operador"></div>
+    <div class="form-field"><label>Perfil de Acesso</label>
+      <select id="k-perfil"><option value="admin">🔴 Admin</option><option value="gerente">🟡 Gerente</option><option value="operador" selected>🟢 Operador</option></select>
+    </div>
+    <div class="form-field"><label>Validade</label><input type="date" id="k-validade"></div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:11px;font-family:var(--font-mono);color:var(--text3);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:10px;">Permissões</label>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="switch-row" style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div class="switch-info"><div class="switch-label" style="font-size:14px;">Ver Pedidos</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="switch-row" style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div class="switch-info"><div class="switch-label" style="font-size:14px;">Resgatar Brindes</div></div>
+          <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="switch-row" style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div class="switch-info"><div class="switch-label" style="font-size:14px;">Ver Financeiro</div></div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="switch-row" style="padding:10px 0;">
+          <div class="switch-info"><div class="switch-label" style="font-size:14px;">Editar Cardápio</div></div>
+          <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="createKey()">Gerar Key</button>
+  </div>
+</div>
+
+<!-- Sheet: Cupom -->
+<div class="sheet-overlay" id="overlay-sheet-cupom" onclick="closeSheet('sheet-cupom')"></div>
+<div class="sheet" id="sheet-cupom">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title">🏷️ Novo Cupom</div>
+    <div class="sheet-close" onclick="closeSheet('sheet-cupom')">✕</div>
+  </div>
+  <div class="sheet-body">
+    <div class="form-field"><label>Código</label><input type="text" id="cup-codigo" placeholder="Ex: PROMO10" style="text-transform:uppercase;"></div>
+    <div class="form-field"><label>Tipo</label>
+      <select id="cup-tipo"><option value="percent">Percentual (%)</option><option value="fixo">Valor Fixo (R$)</option><option value="frete">Frete Grátis</option></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-field"><label>Desconto</label><input type="number" id="cup-valor" inputmode="decimal"></div>
+      <div class="form-field"><label>Limite Usos</label><input type="number" id="cup-limite" placeholder="100" inputmode="numeric"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-field"><label>Validade</label><input type="date" id="cup-validade"></div>
+      <div class="form-field"><label>Pedido Mínimo</label><input type="number" id="cup-minimo" step="0.01" inputmode="decimal"></div>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="createCupom()">Criar Cupom</button>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notify"></div>
+
+<script>
+const API_URL = 'https://labsystem-api.lab-wokerlabcore.workers.dev';
+let storeData = {}, products = [], keys = [], orders = [], cupons = [];
+let currentPage = 'dashboard';
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  loadFromStorage();
+  renderDashboard();
+  renderProductsMobile();
+  renderOrdersMobile();
+  renderMiniChart();
+  renderTopProdsMobile();
+  // Color sync
+  ['c-cor1','c-cor2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', e => {
+      document.getElementById(id + '-hex').value = e.target.value;
+    });
+  });
+});
+
+// ── STORAGE ──
+function loadFromStorage() {
+  const saved = localStorage.getItem('labsystem_data');
+  if (saved) {
+    const d = JSON.parse(saved);
+    storeData = d.store || {};
+    products = d.products || getSampleProducts();
+    keys = d.keys || [];
+    orders = d.orders || getSampleOrders();
+    cupons = d.cupons || [];
+  } else {
+    products = getSampleProducts();
+    orders = getSampleOrders();
+  }
+  if (storeData.nome) { 
+    document.getElementById('c-nome').value = storeData.nome;
+    document.getElementById('drawer-store-name').textContent = storeData.nome;
+  }
+  if (storeData.slogan) document.getElementById('c-slogan').value = storeData.slogan;
+  if (storeData.whatsapp) document.getElementById('cfg-whatsapp').value = storeData.whatsapp;
+}
+
+function saveToStorage() {
+  localStorage.setItem('labsystem_data', JSON.stringify({ store: storeData, products, keys, orders, cupons }));
+}
+
+// ── PAGE NAVIGATION ──
+function switchPage(page, navIdx) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  if (navIdx !== undefined && navIdx < 5) document.getElementById('nav-' + navIdx)?.classList.add('active');
+  currentPage = page;
+  if (page === 'labgame') loadGameStats();
+  if (page === 'keys') renderKeysMobile();
+  if (page === 'cupons') renderCuponsMobile();
+}
+
+function goPage(page) {
+  switchPage(page, undefined);
+  closeDrawer();
+}
+
+// ── DRAWER ──
+function openDrawer() {
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+}
+
+// ── BOTTOM SHEETS ──
+function openSheet(id) {
+  document.getElementById('overlay-' + id)?.classList.add('open');
+  setTimeout(() => document.getElementById(id)?.classList.add('open'), 10);
+}
+function closeSheet(id) {
+  document.getElementById(id)?.classList.remove('open');
+  setTimeout(() => document.getElementById('overlay-' + id)?.classList.remove('open'), 300);
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const total = orders.reduce((s, o) => s + (o.total || 0), 0);
+  document.getElementById('stat-vendas').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+  document.getElementById('stat-pedidos').textContent = orders.length;
+  const baixo = products.filter(p => p.estoque <= p.alerta).length;
+  document.getElementById('stat-estoque').textContent = baixo;
+  renderRecentOrdersMobile();
+}
+
+function renderMiniChart() {
+  const dias = ['S','T','Q','Q','S','S','D'];
+  const vals = dias.map((_, i) => Math.floor(Math.random() * 70) + 20);
+  const max = Math.max(...vals);
+  const chart = document.getElementById('mini-chart');
+  const labels = document.getElementById('mini-labels');
+  chart.innerHTML = vals.map((v, i) => 
+    `<div class="mini-bar ${i === 6 ? 'today' : ''}" style="height:${(v/max)*100}%" title="${dias[i]}"></div>`
+  ).join('');
+  labels.innerHTML = dias.map(d => `<div style="flex:1;text-align:center;font-size:9px;color:var(--text3);font-family:var(--font-mono);">${d}</div>`).join('');
+}
+
+function renderTopProdsMobile() {
+  const el = document.getElementById('top-prods-mobile');
+  const sorted = [...products].sort((a, b) => (b.vendas||0) - (a.vendas||0)).slice(0, 4);
+  const max = sorted[0]?.vendas || 1;
+  el.innerHTML = `<div style="padding:0 16px 8px;">` + sorted.map(p => `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+        <span style="color:var(--text);font-weight:500;">${p.img} ${p.nome}</span>
+        <span style="font-family:var(--font-mono);color:var(--accent3);font-size:12px;">${p.vendas||0}x</span>
+      </div>
+      <div class="progress"><div class="progress-fill g" style="width:${((p.vendas||0)/max)*100}%"></div></div>
+    </div>`).join('') + `</div>`;
+}
+
+function renderRecentOrdersMobile() {
+  const el = document.getElementById('recent-orders-mobile');
+  if (!orders.length) { el.innerHTML = '<div class="card"><div style="padding:30px;text-align:center;color:var(--text3);">Nenhum pedido ainda.</div></div>'; return; }
+  el.innerHTML = orders.slice(0, 5).map(o => `
+    <div class="order-card">
+      <div class="order-top">
+        <span class="order-id">#${String(o.id).slice(-8)}</span>
+        <span class="badge ${badgeClass(o.status)}">${o.status}</span>
+      </div>
+      <div class="order-cliente">${o.cliente}</div>
+      <div class="order-info">${o.itens} · ${o.data}</div>
+      <div class="order-bottom">
+        <span class="order-total">R$ ${(o.total||0).toFixed(2).replace('.',',')}</span>
+        <button class="btn btn-outline btn-sm">Ver →</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderOrdersMobile() {
+  const el = document.getElementById('orders-mobile');
+  if (!orders.length) { el.innerHTML = '<div class="card"><div style="padding:30px;text-align:center;color:var(--text3);">Nenhum pedido.</div></div>'; return; }
+  el.innerHTML = orders.map(o => `
+    <div class="order-card">
+      <div class="order-top">
+        <span class="order-id">#${String(o.id).slice(-8)}</span>
+        <span class="badge ${badgeClass(o.status)}">${o.status}</span>
+      </div>
+      <div class="order-cliente">${o.cliente}</div>
+      <div class="order-info">${o.itens} · ${o.data}</div>
+      <div class="order-bottom">
+        <span class="order-total">R$ ${(o.total||0).toFixed(2).replace('.',',')}</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm">Detalhes</button>
+          <button class="btn btn-success btn-sm">✓</button>
+        </div>
+      </div>
+    </div>`).join('');
+  // Badge
+  const badge = document.getElementById('orders-badge');
+  const pending = orders.filter(o => o.status === 'Pendente').length;
+  if (pending > 0) { badge.textContent = pending; badge.style.display = 'flex'; }
+}
+
+function badgeClass(s) {
+  return { 'Concluído':'badge-green','Preparando':'badge-blue','Pendente':'badge-amber','Cancelado':'badge-red','Entregando':'badge-blue' }[s] || 'badge-gray';
+}
+
+// ── PRODUCTS ──
+function getSampleProducts() {
+  return [
+    { id:'p1', nome:'McClone Classic', cat:'🍔 Hambúrgueres', preco:18.90, estoque:45, alerta:10, vendas:38, img:'🍔', ativo:true, destaque:true },
+    { id:'p2', nome:'McClone Duplo', cat:'🍔 Hambúrgueres', preco:26.90, estoque:30, alerta:10, vendas:22, img:'🍔', ativo:true },
+    { id:'p3', nome:'Batata Frita M', cat:'🍟 Porções', preco:12.90, estoque:8, alerta:10, vendas:41, img:'🍟', ativo:true },
+    { id:'p4', nome:'Coca-Cola 350ml', cat:'🥤 Bebidas', preco:6.90, estoque:60, alerta:15, vendas:55, img:'🥤', ativo:true },
+    { id:'p5', nome:'Milk Shake', cat:'🥤 Bebidas', preco:16.90, estoque:2, alerta:5, vendas:18, img:'🧋', ativo:true },
+  ];
+}
+
+function renderProductsMobile() {
+  const cats = [...new Set(products.map(p => p.cat))];
+  const filterEl = document.getElementById('cat-filter-mobile');
+  filterEl.innerHTML = '<button class="btn btn-primary btn-sm" style="white-space:nowrap;" onclick="filterCatMobile(\'all\',this)">Todos</button>' +
+    cats.map(c => `<button class="btn btn-outline btn-sm" style="white-space:nowrap;" onclick="filterCatMobile('${c}',this)">${c}</button>`).join('');
+
+  const grid = document.getElementById('product-list-mobile');
+  grid.innerHTML = products.map(p => `
+    <div class="product-row" id="pm-${p.id}">
+      <div class="product-thumb">${p.img.startsWith('http') ? `<img src="${p.img}">` : p.img}</div>
+      <div class="list-body">
+        <div class="list-title">${p.nome} ${p.destaque ? '⭐' : ''}</div>
+        <div class="list-sub">${p.cat}</div>
+        <div style="margin-top:4px;display:flex;gap:6px;align-items:center;">
+          <span style="font-size:11px;color:${p.estoque<=p.alerta?'var(--danger)':'var(--accent3)'};">● ${p.estoque} un.</span>
+          ${p.estoque<=p.alerta?'<span class="badge badge-red" style="font-size:9px;">⚠ Baixo</span>':''}
+        </div>
+      </div>
+      <div class="list-right">
+        <div class="list-price">R$ ${p.preco.toFixed(2).replace('.',',')}</div>
+        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteProduct('${p.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function filterCatMobile(cat, el) {
+  document.querySelectorAll('#cat-filter-mobile .btn').forEach(b => b.className = 'btn btn-outline btn-sm');
+  el.className = 'btn btn-primary btn-sm';
+  products.forEach(p => {
+    const row = document.getElementById('pm-' + p.id);
+    if (row) row.style.display = (cat === 'all' || p.cat === cat) ? 'flex' : 'none';
+  });
+}
+
+function filterProductsMobile(q) {
+  const lower = q.toLowerCase();
+  products.forEach(p => {
+    const row = document.getElementById('pm-' + p.id);
+    if (row) row.style.display = p.nome.toLowerCase().includes(lower) ? 'flex' : 'none';
+  });
+}
+
+function addProduct() {
+  const p = {
+    id: 'p' + Date.now(),
+    nome: document.getElementById('p-nome').value,
+    cat: document.getElementById('p-cat').value,
+    preco: parseFloat(document.getElementById('p-preco').value) || 0,
+    estoque: parseInt(document.getElementById('p-estoque').value) || 0,
+    alerta: parseInt(document.getElementById('p-alerta').value) || 10,
+    img: document.getElementById('p-img').value || '📦',
+    descricao: document.getElementById('p-desc').value,
+    ativo: document.getElementById('p-ativo').checked,
+    destaque: document.getElementById('p-destaque').checked,
+    vendas: 0,
+  };
+  if (!p.nome) { notify('Digite o nome do produto.', 'error'); return; }
+  products.push(p);
+  saveToStorage();
+  renderProductsMobile();
+  closeSheet('sheet-produto');
+  notify('✅ Produto "' + p.nome + '" adicionado!', 'success');
+}
+
+function deleteProduct(id) {
+  if (!confirm('Remover produto?')) return;
+  products = products.filter(p => p.id !== id);
+  saveToStorage();
+  renderProductsMobile();
+  notify('🗑️ Produto removido.', 'success');
+}
+
+// ── SAMPLE ORDERS ──
+function getSampleOrders() {
+  return [
+    { id:1770668382595, data:'19/02/2026', cliente:'João', itens:'2 itens', total:37.80, status:'Concluído' },
+    { id:1770668382596, data:'19/02/2026', cliente:'Maria', itens:'1 item', total:18.90, status:'Preparando' },
+    { id:1770668382597, data:'19/02/2026', cliente:'Carlos', itens:'3 itens', total:52.70, status:'Pendente' },
+  ];
+}
+
+// ── KEYS ──
+function createKey() {
+  const nome = document.getElementById('k-nome').value;
+  if (!nome) { notify('Digite o nome.', 'error'); return; }
+  const key = {
+    id: 'func-' + Date.now(),
+    nome,
+    perfil: document.getElementById('k-perfil').value,
+    key: 'KEY-' + Math.random().toString(36).substr(2,4).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase(),
+    validade: document.getElementById('k-validade').value,
+    ativo: true,
+    criadoEm: new Date().toLocaleDateString('pt-BR'),
+  };
+  keys.push(key);
+  saveToStorage();
+  renderKeysMobile();
+  closeSheet('sheet-key');
+  notify('🔑 Key: ' + key.key, 'success');
+}
+
+function renderKeysMobile() {
+  const el = document.getElementById('keys-list-mobile');
+  const perfis = { admin:'🔴 Admin', gerente:'🟡 Gerente', operador:'🟢 Operador' };
+  if (!keys.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);">Nenhuma key criada.</div>';
+    return;
+  }
+  el.innerHTML = keys.map(k => `
+    <div class="key-card">
+      <div class="key-avatar">${k.nome[0]}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:600;color:var(--text);">${k.nome}</div>
+        <div style="font-size:11px;color:var(--text3);">${perfis[k.perfil]||k.perfil}</div>
+        <div class="key-code">${k.key}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        <span class="badge ${k.ativo?'badge-green':'badge-red'}">${k.ativo?'Ativo':'Inativo'}</span>
+        <button class="btn btn-danger btn-sm" onclick="revokeKey('${k.id}')">Revogar</button>
+      </div>
+    </div>`).join('');
+}
+
+function revokeKey(id) {
+  keys = keys.filter(k => k.id !== id);
+  saveToStorage();
+  renderKeysMobile();
+  notify('🔑 Key revogada.', 'success');
+}
+
+// ── CUPONS ──
+function createCupom() {
+  const codigo = document.getElementById('cup-codigo').value.toUpperCase();
+  if (!codigo) { notify('Digite o código.', 'error'); return; }
+  const c = {
+    id: 'cup-' + Date.now(),
+    codigo,
+    tipo: document.getElementById('cup-tipo').value,
+    valor: parseFloat(document.getElementById('cup-valor').value) || 0,
+    limite: parseInt(document.getElementById('cup-limite').value) || 999,
+    usos: 0,
+    validade: document.getElementById('cup-validade').value,
+    minimo: parseFloat(document.getElementById('cup-minimo').value) || 0,
+    ativo: true,
+  };
+  cupons.push(c);
+  saveToStorage();
+  renderCuponsMobile();
+  closeSheet('sheet-cupom');
+  notify('🏷️ Cupom ' + codigo + ' criado!', 'success');
+}
+
+function renderCuponsMobile() {
+  const el = document.getElementById('cupons-list-mobile');
+  if (!cupons.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);">Nenhum cupom.</div>'; return; }
+  const tipos = { percent:'%', fixo:'R$', frete:'Frete' };
+  el.innerHTML = cupons.map(c => `
+    <div class="list-item">
+      <div class="list-avatar" style="background:rgba(0,212,255,.1);color:var(--accent);font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:10px;">${tipos[c.tipo]||'?'}</div>
+      <div class="list-body">
+        <div class="list-title">${c.codigo}</div>
+        <div class="list-sub">${c.tipo==='frete'?'Frete Grátis':c.tipo==='percent'?c.valor+'% de desconto':'R$ '+c.valor.toFixed(2)} ${c.validade?'· até '+c.validade:''}</div>
+      </div>
+      <div class="list-right">
+        <span class="badge ${c.ativo?'badge-green':'badge-red'}">${c.ativo?'Ativo':'Off'}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteCupom('${c.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+function deleteCupom(id) {
+  cupons = cupons.filter(c => c.id !== id);
+  saveToStorage();
+  renderCuponsMobile();
+}
+
+// ── GAME ──
+function saveMimoConfig() {
+  const cfg = {
+    freq: document.getElementById('m-freq').value,
+    tempo: document.getElementById('m-tempo').value,
+    brinde: document.getElementById('m-brinde').value,
+    valor: document.getElementById('m-valor').value,
+    validade: document.getElementById('m-validade').value,
+    qtd: document.getElementById('m-qtd').value,
+    exibicao: document.getElementById('m-exibicao').value,
+  };
+  storeData.mimogame = cfg;
+  saveToStorage();
+  document.getElementById('m-freq-tag').textContent = '1/' + cfg.freq + ' jogadas';
+  document.getElementById('m-brinde-tag').textContent = 'Brinde: ' + (cfg.brinde || '—');
+  closeSheet('sheet-mimogame');
+  notify('✅ MimoGame salvo!', 'success');
+}
+
+function saveSlotsConfig() {
+  storeData.slots = { creditos: document.getElementById('s-creditos').value, razao: document.getElementById('s-razao').value };
+  document.getElementById('s-cred-tag').textContent = storeData.slots.creditos + ' créditos';
+  document.getElementById('s-razao-tag').textContent = storeData.slots.razao + '/R$1';
+  saveToStorage();
+  closeSheet('sheet-slots');
+  notify('✅ Slots salvo!', 'success');
+}
+
+function saveGameConfig() {
+  saveToStorage();
+}
+
+async function loadGameStats() {
+  const storeId = document.getElementById('cfg-store-id')?.value;
+  const masterKey = document.getElementById('cfg-master-key')?.value;
+  if (!storeId || !masterKey) return;
+  try {
+    const r = await fetch(`${API_URL}/mimogame/stats/${storeId}`, { headers: { 'X-Master-Key': masterKey } });
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById('g-total').textContent = d.stats.totalJogadas;
+      document.getElementById('g-pendentes').textContent = d.stats.brindesPendentes;
+      document.getElementById('g-resgatados').textContent = d.stats.brindesResgatados;
+      document.getElementById('stat-jogadas').textContent = d.stats.totalJogadas;
+      document.getElementById('stat-brindes').textContent = d.stats.brindesPendentes + ' brindes';
+    }
+  } catch(e) {}
+}
+
+// ── CUSTOMIZATION ──
+function saveCustomization() {
+  storeData.nome = document.getElementById('c-nome').value;
+  storeData.slogan = document.getElementById('c-slogan').value;
+  storeData.logo = document.getElementById('c-logo').value;
+  storeData.fundo = document.getElementById('c-fundo').value;
+  storeData.corPrimaria = document.getElementById('c-cor1').value;
+  storeData.corSecundaria = document.getElementById('c-cor2').value;
+  storeData.musica = document.getElementById('c-musica').value;
+  storeData.volume = document.getElementById('c-volume').value;
+  document.getElementById('drawer-store-name').textContent = storeData.nome || 'Minha Loja';
+  saveToStorage();
+  notify('🎨 Visual salvo!', 'success');
+}
+
+function applyPreset(c1, c2) {
+  document.getElementById('c-cor1').value = c1;
+  document.getElementById('c-cor1-hex').value = c1;
+  document.getElementById('c-cor2').value = c2;
+  document.getElementById('c-cor2-hex').value = c2;
+}
+
+// ── CONFIG ──
+function saveConfig() {
+  storeData.whatsapp = document.getElementById('cfg-whatsapp').value;
+  storeData.status = document.getElementById('cfg-status').value;
+  storeData.segmento = document.getElementById('cfg-segmento').value;
+  storeData.apiUrl = document.getElementById('cfg-api').value;
+  storeData.storeId = document.getElementById('cfg-store-id').value;
+  saveToStorage();
+  notify('⚙️ Config salva!', 'success');
+}
+
+async function testConnection() {
+  const url = document.getElementById('cfg-api').value || API_URL;
+  try {
+    notify('🔌 Testando...', 'success');
+    const r = await fetch(url + '/status');
+    const d = await r.json();
+    if (d.ok) notify('✅ API online!', 'success');
+    else notify('⚠️ Erro na API.', 'error');
+  } catch(e) { notify('❌ Falha na conexão.', 'error'); }
+}
+
+// ── PUBLISH ──
+async function publishData() {
+  const storeId = document.getElementById('cfg-store-id')?.value || storeData.storeId;
+  const masterKey = document.getElementById('cfg-master-key')?.value;
+  if (!storeId) { notify('⚠️ Configure o Store ID primeiro.', 'error'); return; }
+  if (!masterKey) { notify('⚠️ Configure a Master Key primeiro.', 'error'); return; }
+  const payload = {
+    loja: storeData,
+    cardapio: [...new Set(products.map(p=>p.cat))].map(cat => ({
+      categoriaNome: cat,
+      produtos: products.filter(p => p.cat===cat && p.ativo).map(p => ({ id:p.id,nome:p.nome,preco:p.preco,imagem:p.img,estoque:p.estoque,destaque:p.destaque }))
+    })),
+    gamezone: { mimogame: storeData.mimogame, slots: storeData.slots },
+    atualizadoEm: new Date().toISOString(),
+  };
+  try {
+    notify('📡 Publicando...', 'success');
+    const r = await fetch(`${API_URL}/loja/${storeId}`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':masterKey},
+      body:JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.ok) notify('🚀 Publicado!', 'success');
+    else notify('❌ Erro: ' + d.error, 'error');
+  } catch(e) { notify('❌ Erro de rede.', 'error'); }
+}
+
+// ── NOTIFY ──
+function notify(msg, type='success') {
+  const el = document.getElementById('notify');
+  const item = document.createElement('div');
+  item.className = 'notify-item ' + type;
+  item.textContent = msg;
+  el.appendChild(item);
+  setTimeout(() => item.remove(), 3500);
+}
+
+/* ══════════════════════════════════════
+   QR-LAB
+══════════════════════════════════════ */
+let qrCurrentType = 'site';
+
+function selectQRType(el, type) {
+  document.querySelectorAll('.qr-type-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  qrCurrentType = type;
+  const presets = {
+    site: '', labmenu: 'https://labriolag.shop/menu', labpay: 'https://labriolag.shop/pay',
+    lablink: 'https://labriolag.shop/link', labchain: 'https://labriolag.shop/chain',
+    labgame: 'https://labriolag.shop/game'
+  };
+  document.getElementById('qr-url').value = presets[type] || '';
+}
+
+function gerarQR() {
+  const url = document.getElementById('qr-url').value.trim();
+  const mode = document.getElementById('qr-mode').value;
+  const qty = parseInt(document.getElementById('qr-qty').value) || 1;
+  const color = document.getElementById('qr-color').value;
+  const bg = document.getElementById('qr-bg').value;
+
+  if (!url && mode === 'manual') { notify('Preencha a URL!', 'error'); return; }
+
+  let finalUrl = url;
+  if (mode === 'numerado') finalUrl = url + (url.endsWith('=') ? '' : '?src=') + String(Math.floor(Math.random()*99)+1).padStart(2,'0');
+  else if (mode === 'letras') finalUrl = url + (url.endsWith('=') ? '' : '?src=') + String.fromCharCode(65 + Math.floor(Math.random()*26));
+  else if (mode === 'aleatorio') {
+    const r = Math.random().toString(36).substring(2,8).toUpperCase();
+    finalUrl = url + (url.endsWith('=') ? '' : '?src=') + r;
+  }
+
+  // Generate QR using Google Charts API (no lib needed)
+  const wrap = document.getElementById('qr-canvas-wrap');
+  const encoded = encodeURIComponent(finalUrl);
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encoded}&color=${color.replace('#','')}&bgcolor=${bg.replace('#','')}`;
+  wrap.innerHTML = `<img src="${qrUrl}" width="150" height="150" style="border-radius:6px;display:block;">`;
+
+  document.getElementById('qr-url-display').textContent = finalUrl;
+  document.getElementById('qr-preview-card').style.display = 'block';
+
+  // HMAC signature
+  const hmacKey = document.getElementById('qr-hmac-key').value;
+  if (hmacKey) {
+    gerarHMAC(finalUrl, hmacKey);
+  }
+
+  notify(`QR Code gerado! (${qrCurrentType.toUpperCase()})`, 'success');
+}
+
+async function gerarHMAC(data, key) {
+  try {
+    const enc = new TextEncoder();
+    const cryptoKey = await crypto.subtle.importKey('raw', enc.encode(key), {name:'HMAC',hash:'SHA-256'}, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc.encode(data));
+    const hex = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,'0')).join('');
+    document.getElementById('qr-sig-value').textContent = hex;
+    document.getElementById('qr-signature-result').style.display = 'block';
+  } catch(e) { console.warn('HMAC:', e); }
+}
+
+function downloadQR() {
+  const img = document.querySelector('#qr-canvas-wrap img');
+  if (!img) return;
+  const a = document.createElement('a');
+  a.href = img.src; a.download = 'labriolag-qr.png'; a.click();
+  notify('QR Code baixado!');
+}
+
+function compartilharQR() {
+  const url = document.getElementById('qr-url-display').textContent;
+  if (navigator.share) navigator.share({ title: 'QR Code Labriolag', url });
+  else { navigator.clipboard?.writeText(url); notify('URL copiada!'); }
+}
+
+/* ══════════════════════════════════════
+   LABCHAIN
+══════════════════════════════════════ */
+async function hashString(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function fakebtcTx() {
+  return Array.from({length:64}, ()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+}
+
+async function registrarLabChain() {
+  const tipo = document.getElementById('chain-doc-type').value;
+  const partes = document.getElementById('chain-partes').value.trim();
+  const cidade = document.getElementById('chain-cidade').value;
+  const conteudo = document.getElementById('chain-content').value.trim();
+
+  if (!partes || !conteudo) { notify('Preencha todos os campos!', 'error'); return; }
+
+  const ts = new Date().toISOString();
+  const docStr = `${tipo}|${partes}|${cidade}|${conteudo}|${ts}`;
+  const docHash = await hashString(docStr);
+  const btcTx = fakebtcTx();
+
+  // Cert URL
+  const certUrl = `https://labriolag.shop/chain/verify?h=${docHash.substring(0,16)}&t=${Date.now()}`;
+
+  // Display
+  document.getElementById('chain-doc-hash').textContent = docHash;
+  document.getElementById('chain-timestamp').textContent = new Date().toLocaleString('pt-BR') + ' · Hash ID: ' + docHash.substring(0,8).toUpperCase();
+  document.getElementById('chain-btc-tx').textContent = btcTx + ' (1 Sat → LabSocial Pirapora)';
+
+  // QR do certificado
+  const wrap = document.getElementById('chain-qr-wrap');
+  wrap.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(certUrl)}&color=f5a623&bgcolor=ffffff" width="100" height="100" style="border-radius:4px;">`;
+
+  document.getElementById('chain-result-card').style.display = 'block';
+
+  // Save to history
+  const history = JSON.parse(localStorage.getItem('labchain_history') || '[]');
+  const entry = { tipo, partes, cidade, hash: docHash, tx: btcTx, ts };
+  history.unshift(entry);
+  localStorage.setItem('labchain_history', JSON.stringify(history.slice(0,20)));
+
+  renderChainHistory();
+  updateChainStats();
+  notify('Documento registrado na LabChain! 🔐', 'success');
+}
+
+function renderChainHistory() {
+  const history = JSON.parse(localStorage.getItem('labchain_history') || '[]');
+  const el = document.getElementById('chain-history-list');
+  const labels = { contrato:'📋 Contrato', nota:'🧾 Recibo', certificado:'🏆 Cert.', termo:'📄 Termo', acordo:'🤝 Acordo' };
+  if (!history.length) {
+    el.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text3);font-size:11px;">Nenhum registro ainda.</div>';
+    return;
+  }
+  el.innerHTML = history.map(r => `
+    <div class="chain-item">
+      <div class="chain-icon">🔐</div>
+      <div class="chain-info">
+        <div class="chain-doc-type">${labels[r.tipo] || r.tipo} · ${r.partes.split('+')[0].trim()}</div>
+        <div class="chain-hash-preview">${r.hash.substring(0,32)}...</div>
+      </div>
+      <div class="chain-ts">${new Date(r.ts).toLocaleDateString('pt-BR')}<br><span style="color:var(--accent3);">✓ 1 Sat</span></div>
+    </div>
+  `).join('');
+}
+
+function updateChainStats() {
+  const history = JSON.parse(localStorage.getItem('labchain_history') || '[]');
+  const elDocs = document.getElementById('chain-total-docs');
+  const elSats = document.getElementById('chain-total-sats');
+  const elCount = document.getElementById('chain-count');
+  if (elDocs) elDocs.textContent = history.length;
+  if (elSats) elSats.textContent = history.length;
+  if (elCount) elCount.textContent = `${history.length} registro${history.length !== 1 ? 's' : ''}`;
+}
+
+function copiarHash() {
+  const h = document.getElementById('chain-doc-hash').textContent;
+  navigator.clipboard?.writeText(h);
+  notify('Hash copiada!');
+}
+
+function gerarCertificadoPDF() {
+  notify('Gerando certificado... (disponível na versão Pro)');
+}
+
+/* ══════════════════════════════════════
+   WAR ROOM
+══════════════════════════════════════ */
+const wrEvents = [
+  { dot: '#00d4ff', msg: 'Scan · QR Chaveiro · Pirapora Centro' },
+  { dot: '#f5a623', msg: 'Lead capturado · LabLink Premium' },
+  { dot: '#00ff88', msg: 'Pedido confirmado · Pizzaria João' },
+  { dot: '#ff4757', msg: 'Carrinho abandonado · R$ 47,90' },
+  { dot: '#00d4ff', msg: 'Scan · QR Imã Geladeira · Av. Principal' },
+  { dot: '#f5a623', msg: 'Conversão · LabPay Pix · R$ 89,00' },
+];
+
+let wrEventIdx = 0;
+function pushWREvent() {
+  const feed = document.getElementById('wr-feed');
+  if (!feed) return;
+  const e = wrEvents[wrEventIdx % wrEvents.length];
+  wrEventIdx++;
+  const now = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const item = document.createElement('div');
+  item.className = 'wr-event';
+  item.innerHTML = `<span class="wr-event-dot" style="background:${e.dot};"></span><span style="color:var(--text2);flex:1;">${e.msg}</span><span style="color:var(--text3);">${now}</span>`;
+  feed.insertBefore(item, feed.firstChild);
+  if (feed.children.length > 8) feed.removeChild(feed.lastChild);
+
+  // update counters
+  const scans = document.getElementById('wr-scans');
+  const leads = document.getElementById('wr-leads');
+  if (scans) scans.textContent = parseInt(scans.textContent || 0) + (Math.random() > .6 ? 1 : 0);
+  if (leads) leads.textContent = parseInt(leads.textContent || 0) + (Math.random() > .8 ? 1 : 0);
+  const conv = document.getElementById('wr-conv');
+  if (conv) conv.textContent = (Math.random()*15+5).toFixed(1) + '%';
+  const bounce = document.getElementById('wr-bounce');
+  if (bounce) bounce.textContent = (Math.random()*30+20).toFixed(0) + '%';
+}
+
+function dispararSniper() {
+  notify('🚀 Campanha disparada! Monitorando conversões...', 'success');
+  pushWREvent();
+}
+
+// Start War Room live feed
+setInterval(pushWREvent, 4000);
+
+// Init on load
+document.addEventListener('DOMContentLoaded', () => {
+  renderChainHistory();
+  updateChainStats();
+  pushWREvent();
+});
+</script>
+</body>
+</html>
