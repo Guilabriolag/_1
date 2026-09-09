@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zyro.dev/schemas/indexspace.v1.schema.json",
+  "title": "ZYRO Index Space v1",
+  "description": "Sistema de endereçamento genérico do ZYRO. Não é um sistema de coordenadas — coordenadas são só uma das formas possíveis de ADDRESS. Um documento Index Space contém um ou mais SPACEs, e as ENTITY (referenciadas por id, definidas no contrato de mundo à parte) que os ocupam.",
+  "type": "object",
+  "required": ["schema", "spaces"],
+  "properties": {
+    "schema": {
+      "const": "zyro.indexspace.v1"
+    },
+    "spaces": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/space" },
+      "description": "Cada space define sua própria forma de endereço. território, inventário, fila e diálogo podem coexistir no mesmo documento sem se conhecer."
+    },
+    "occupancies": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/occupancy" },
+      "default": []
+    },
+    "connections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/connection" },
+      "default": []
+    }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+
+    "space": {
+      "type": "object",
+      "description": "Define a ESTRUTURA de endereçamento de um domínio (território, inventário, fila, diálogo, etc). O space é quem dá significado ao conteúdo de address — o mesmo campo 'x' não significa a mesma coisa em dois spaces diferentes, e não precisa significar.",
+      "required": ["id", "name", "address_shape"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Identificador estável do space, ex: 'territorio_fisico', 'inventario_player_42', 'fila_mensagens_npc07'."
+        },
+        "name": {
+          "type": "string",
+          "description": "Rótulo legível em português para debug/HUD/editor, ex: 'Território físico — Região de Barueri'."
+        },
+        "address_shape": {
+          "$ref": "https://json-schema.org/draft/2020-12/schema",
+          "description": "Um JSON Schema que qualquer address.value deste space precisa satisfazer. É a própria definição formal de 'a forma do endereço aqui'. Ex: {type:object, required:[x,y,z], properties:{x:{type:integer}, ...}} para território; {type:object, required:[slot], properties:{slot:{type:integer,minimum:0}}} para inventário."
+        },
+        "geometry": {
+          "type": "string",
+          "enum": ["discrete", "continuous", "hybrid"],
+          "description": "Metadado opcional só para renderers/motor de movimento decidirem como andar de endereço em endereço — não afeta a validade do address em si."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "address_ref": {
+      "type": "object",
+      "description": "Referência completa e autocontida a um endereço: o space que define sua forma, mais o valor nessa forma. Nunca existe um address 'solto' sem saber a qual space ele pertence.",
+      "required": ["space", "value"],
+      "properties": {
+        "space": {
+          "type": "string",
+          "description": "id do space (ver #/$defs/space/properties/id) ao qual este endereço pertence."
+        },
+        "value": {
+          "type": "object",
+          "description": "Deve validar contra o address_shape do space referenciado. Esta validação é dinâmica (não estática neste schema) porque cada space define sua própria forma — ver README.md, seção 'Validação dinâmica'."
+        },
+        "local": {
+          "type": "object",
+          "description": "Posição contínua opcional dentro do endereço discreto (0.0–1.0 por eixo, ou o que o space definir). Representação, não identidade — dois entities podem ter o mesmo address e locals diferentes.",
+          "additionalProperties": { "type": "number" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "occupancy": {
+      "type": "object",
+      "description": "ENTITY --occupies--> ADDRESS. É a única forma legítima de dizer 'algo está em algum lugar' — nunca uma entidade grava a própria posição, ela ocupa um endereço através deste registro.",
+      "required": ["id", "entity", "address", "valid_from"],
+      "properties": {
+        "id": { "type": "string" },
+        "entity": {
+          "type": "string",
+          "description": "id opaco e estável da entidade (definida no contrato de mundo ZYRO — world/region/location/entity/relation/event), nunca a entidade inteira embutida aqui."
+        },
+        "address": { "$ref": "#/$defs/address_ref" },
+        "valid_from": { "type": "string", "format": "date-time" },
+        "valid_until": { "type": ["string", "null"], "format": "date-time", "default": null }
+      },
+      "additionalProperties": false
+    },
+
+    "connection": {
+      "type": "object",
+      "description": "ADDRESS --connects--> ADDRESS. Relação EXPLÍCITA entre dois endereços que não pode ser deduzida por vizinhança/adjacência — se dois endereços são vizinhos, o motor de movimento já resolve isso sozinho e não precisa de connection nenhuma. from/to podem estar em spaces diferentes (ex: portal território→território, ou até território→fila).",
+      "required": ["id", "from", "to", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "from": { "$ref": "#/$defs/address_ref" },
+        "to": { "$ref": "#/$defs/address_ref" },
+        "type": {
+          "type": "string",
+          "description": "Natureza da conexão, ex: 'elevator', 'portal', 'bus_route', 'forward', 'door'. Vocabulário aberto — ZeroKey decide o vocabulário canônico à parte, este campo só carrega o valor."
+        },
+        "bidirectional": { "type": "boolean", "default": false },
+        "conditions": {
+          "type": "object",
+          "description": "Extensível — regras de quando a conexão pode ser atravessada (ex: requer chave, requer estado do player). Fora do escopo do v1 fechar esse formato.",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
